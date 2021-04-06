@@ -425,16 +425,15 @@ class GutenbergBlockHelper extends SubstringProcessorHelperAbstract
         throw new SmartlingGutenbergNotFoundException("Gutenberg class not found. Disabling GutenbergSupport.");
     }
 
-    /**
-     * @param array $originalAttributes
-     * @param array $translatedAttributes
-     * @return array
-     */
-    private function fixAttributeTypes(array $originalAttributes, array $translatedAttributes)
+    private function fixAttributeTypes(array $originalAttributes, array $translatedAttributes): array
     {
         foreach ($translatedAttributes as $key => $value) {
             if (array_key_exists($key, $originalAttributes)) {
-                settype($translatedAttributes[$key], gettype($originalAttributes[$key]));
+                if (is_array($value)) {
+                    $translatedAttributes[$key] = $this->fixAttributeTypes($originalAttributes[$key], $translatedAttributes[$key]);
+                } else {
+                    settype($translatedAttributes[$key], gettype($originalAttributes[$key]));
+                }
             }
         }
 
